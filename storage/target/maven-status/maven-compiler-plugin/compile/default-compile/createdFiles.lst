@@ -1,0 +1,6 @@
+net\industryhive\storage\service\FileQuery.class
+net\industryhive\storage\service\FileUpload.class
+net\industryhive\storage\connect\Connector.class
+net\industryhive\storage\StorageApplication.class
+net\industryhive\storage\connect\Initializer.class
+net\industryhive\storage\service\FileDownload.class
