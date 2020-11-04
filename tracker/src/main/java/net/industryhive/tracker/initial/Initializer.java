@@ -12,10 +12,14 @@ import java.util.HashMap;
  * @Create 2020-10-18 11:50
  */
 public class Initializer {
+    static {
+        Constant.setCurrentSys("TRACKER");
+    }
+
     public static final String TRACKER_ID =
-            PropertiesLoader.getValue(Constant.TRACKER_CONF, "tracker.id");
+            PropertiesLoader.getValue("tracker.id");
     public static final String TRACKER_PORT =
-            PropertiesLoader.getValue(Constant.TRACKER_CONF, "tracker.port");
+            PropertiesLoader.getValue("tracker.port");
     public static final HashMap<String, String[]> STORAGE_MAP = new HashMap<>();
 
     public static int initialize() {
@@ -23,7 +27,7 @@ public class Initializer {
         String[] storages;
         for (int i = 0; ; i++) {
             groupName = "group" + i;
-            storages = PropertiesLoader.getValueArray(Constant.TRACKER_CONF, groupName);
+            storages = PropertiesLoader.getValueArray(groupName);
             if (storages == null || storages.length == 0) {
                 break;
             }

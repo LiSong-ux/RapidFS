@@ -1,5 +1,6 @@
 package net.industryhive.common.config;
 
+import net.industryhive.common.system.Constant;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 
 import java.io.*;
@@ -18,8 +19,8 @@ public class PropertiesLoader {
      * @param key 键
      * @return value 值
      */
-    public static String getValue(String path, String key) {
-        File file = new File(path);
+    public static String getValue(String key) {
+        File file = new File(Constant.CURRENT_CONF);
         FileInputStream inStream = null;
         try {
             inStream = new FileInputStream(file);
@@ -35,8 +36,8 @@ public class PropertiesLoader {
         return properties.getProperty(key);
     }
 
-    public static String[] getValueArray(String path, String key) {
-        File file = new File(path);
+    public static String[] getValueArray(String key) {
+        File file = new File(Constant.CURRENT_CONF);
         FileReader fileReader = null;
         PropertiesConfiguration prop = null;
         try {

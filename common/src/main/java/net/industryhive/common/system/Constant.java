@@ -6,6 +6,22 @@ package net.industryhive.common.system;
  */
 public class Constant {
     public static final String OS_NAME = System.getProperty("os.name");
-    public static final String TRACKER_CONF = "../conf/tracker.properties";
-    public static final String STORAGE_CONF = "../conf/storage.properties";
+    private static String CURRENT_SYS;
+    public static String CURRENT_CONF;
+    public static String CURRENT_LOG;
+
+    public static String getCurrentSys() {
+        return CURRENT_SYS;
+    }
+
+    public static void setCurrentSys(String currentSys) {
+        CURRENT_SYS = currentSys;
+        if (currentSys.equals("TRACKER")) {
+            CURRENT_CONF = "../conf/tracker.properties";
+            CURRENT_LOG = "../logs/tracker.log";
+        } else {
+            CURRENT_CONF = "../conf/storage.properties";
+            CURRENT_LOG = "../logs/storage.log";
+        }
+    }
 }

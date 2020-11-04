@@ -13,9 +13,9 @@ import java.util.Date;
  * @Create 2020-10-05 9:48
  */
 public class Logger {
-    private static final File log = new File("../logs/server.log");
+    private static final File log = new File(Constant.CURRENT_LOG);
     private static FileWriter logWriter = null;
-    public static String lineBreak = "\n";
+    private static String lineBreak = "\n";
 
     static {
         try {

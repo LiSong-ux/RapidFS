@@ -12,18 +12,22 @@ import java.util.ArrayList;
  * @Create 2020-10-06 21:38
  */
 public class Initializer {
+    static {
+        Constant.setCurrentSys("STORAGE");
+    }
+
     public static int stageIndex = 0;
     public static String currentStage = "00/00";
     public static String nextStage = "00/01";
     public static final String[] STAGE_NAMES = listStage();
     public static final String GROUP_ID =
-            PropertiesLoader.getValue(Constant.STORAGE_CONF, "group.id");
+            PropertiesLoader.getValue("group.id");
     public static final String STORAGE_ID =
-            PropertiesLoader.getValue(Constant.STORAGE_CONF, "storage.id");
+            PropertiesLoader.getValue("storage.id");
     public static final String STORAGE_PORT =
-            PropertiesLoader.getValue(Constant.STORAGE_CONF, "storage.port");
+            PropertiesLoader.getValue("storage.port");
     public static final String STORE_PATH =
-            PropertiesLoader.getValue(Constant.STORAGE_CONF, "store.path");
+            PropertiesLoader.getValue("store.path");
 
     public static int initialize() {
         if (GROUP_ID == null) {
