@@ -56,8 +56,9 @@ public class FileUpload {
             File file = new File(stage_path + "/" + fileName);
             fos = new FileOutputStream(file);
             byte[] bytes = new byte[1024];
-            while (dis.read(bytes) != -1) {
-                fos.write(bytes);
+            int length;
+            while ((length = dis.read(bytes)) != -1) {
+                fos.write(bytes, 0, length);
             }
             String uploadPath = "group" + Initializer.GROUP_ID + "/M00/" + Initializer.currentStage + "/" + fileName;
             Logger.info("Upload File Success: " + uploadPath);
