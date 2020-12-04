@@ -7,6 +7,8 @@ import java.io.*;
 import java.net.Socket;
 
 /**
+ * 文件下载服务组件
+ *
  * @Author 未央
  * @Create 2020-10-05 16:33
  */

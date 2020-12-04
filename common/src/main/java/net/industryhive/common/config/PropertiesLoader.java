@@ -36,10 +36,16 @@ public class PropertiesLoader {
         return properties.getProperty(key);
     }
 
+    /**
+     * 加载properties文件并根据key获取value数组
+     *
+     * @param key 键
+     * @return 值
+     */
     public static String[] getValueArray(String key) {
         File file = new File(Constant.CURRENT_CONF);
         FileReader fileReader = null;
-        PropertiesConfiguration prop = null;
+        PropertiesConfiguration prop;
         try {
             fileReader = new FileReader(file);
             prop = new PropertiesConfiguration();

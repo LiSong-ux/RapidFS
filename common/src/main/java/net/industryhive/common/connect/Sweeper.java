@@ -9,6 +9,13 @@ import java.net.Socket;
  * @Create 2020-10-18 11:31
  */
 public class Sweeper {
+    /**
+     * 关闭连接并返回状态及结果信息
+     *
+     * @param connection Socket连接
+     * @param status     执行状态
+     * @param result     执行详细信息
+     */
     public static void close(Socket connection, short status, String result) {
         DataOutputStream dos = null;
         try {

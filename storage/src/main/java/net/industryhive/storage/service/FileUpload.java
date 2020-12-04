@@ -15,14 +15,12 @@ import java.util.Base64;
 import java.util.Date;
 
 /**
+ * 文件上传服务组件
+ *
  * @Author 未央
  * @Create 2020-10-05 12:14
  */
 public class FileUpload {
-    public static void main(String[] args) {
-        System.out.println(new Date().getTime());
-    }
-
     public static void upload(Socket connection) {
         DataInputStream dis = null;
         FileOutputStream fos = null;
