@@ -70,14 +70,14 @@ public class Initializer {
             }
             Logger.info("Storage[" + STORAGE_ID + "] Initialize Success");
         }
-        int reStoreResult = reStorePointer(STORE_PATH);
+        int reStoreResult = storePointer(STORE_PATH);
         if (reStoreResult == 0) {
             Logger.info("Number Of Files Stored Normal");
         }
         return 0;
     }
 
-    public static int reStorePointer(String store_path) {
+    public static int storePointer(String store_path) {
         String[] stageNames = listStage();
         int index = 0;
         for (String stageName : STAGE_NAMES) {
@@ -101,6 +101,19 @@ public class Initializer {
         }
         Logger.warning("Files Stored Number Reached Maximum");
         return 1;
+    }
+
+    public static synchronized void reStorePointer(String stagePath) {
+        if (!currentStage.equals(stagePath)) {
+            return;
+        }
+        File stageDir = new File(stagePath);
+        String[] filesNum = stageDir.list();
+        if (filesNum != null && filesNum.length > 99) {
+            stageIndex++;
+            currentStage = STAGE_NAMES[stageIndex];
+            nextStage = STAGE_NAMES[stageIndex + 1];
+        }
     }
 
     private static String[] listStage() {
