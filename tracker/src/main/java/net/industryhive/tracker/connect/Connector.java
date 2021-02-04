@@ -1,10 +1,11 @@
 package net.industryhive.tracker.connect;
 
 import net.industryhive.common.connect.Sweeper;
-import net.industryhive.common.logger.LogInfo;
-import net.industryhive.common.logger.Logger;
+import net.industryhive.common.logger.TrackerMsg;
 import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.tracker.initial.Initializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.Random;
 public class Connector {
     private static ServerSocket SERVER_SOCKET = null;
     private static boolean flag = true;
+    private static final Logger logger = LoggerFactory.getLogger("tracker");
 
     static {
         try {
@@ -37,29 +39,29 @@ public class Connector {
 
     public static void connect() {
         if (Initializer.initialize() != 0) {
-            Logger.error(LogInfo.TRACKER_START_FAILURE(Initializer.TRACKER_ID));
+            logger.error(TrackerMsg.TRACKER_START_FAILURE(Initializer.TRACKER_ID));
             return;
         }
-        Logger.info(LogInfo.TRACKER_START_SUCCESS(Initializer.TRACKER_ID));
+        logger.info(TrackerMsg.TRACKER_START_SUCCESS(Initializer.TRACKER_ID));
         while (flag) {
             try {
                 Socket connection = SERVER_SOCKET.accept();
                 InputStream reqStream = connection.getInputStream();
-                byte[] header = new byte[8];
+                byte[] header = new byte[9];
                 int length = reqStream.read(header);
-                byte[] recognize = Arrays.copyOf(header, 7);
-                if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE)) {
-                    Logger.warning(LogInfo.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, LogInfo.INVALID_PROTOCOL);
+                byte[] recognize = Arrays.copyOf(header, 8);
+                if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE_TRACKER)) {
+                    logger.warn(TrackerMsg.INVALID_PROTOCOL);
+                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
                     continue;
                 }
-                if (header[7] == BaseProtocol.UPLOAD_COMMAND) {
+                if (header[8] == BaseProtocol.UPLOAD_COMMAND) {
                     Random random = new Random();
                     int groupIndex = random.nextInt(Initializer.STORAGE_MAP.size());
                     String[] storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
                     int storageIndex = random.nextInt(storages.length);
                     Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
-                } else if (header[7] == BaseProtocol.DOWNLOAD_COMMAND || header[7] == BaseProtocol.QUERY_COMMAND) {
+                } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND || header[7] == BaseProtocol.QUERY_COMMAND) {
                     DataInputStream dis = new DataInputStream(reqStream);
                     String filePath = dis.readUTF();
                     String groupName = filePath.substring(0, filePath.indexOf('/'));
@@ -72,8 +74,8 @@ public class Connector {
                     String[] storages = Initializer.STORAGE_MAP.get(groupName);
                     Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
                 } else {
-                    Logger.warning(LogInfo.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, LogInfo.INVALID_PROTOCOL);
+                    logger.warn(TrackerMsg.INVALID_PROTOCOL);
+                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

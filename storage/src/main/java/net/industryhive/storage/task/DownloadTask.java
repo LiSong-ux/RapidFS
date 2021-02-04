@@ -1,7 +1,8 @@
 package net.industryhive.storage.task;
 
-import net.industryhive.common.logger.Logger;
 import net.industryhive.storage.initial.Initializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,6 +18,7 @@ public class DownloadTask implements Runnable {
     private DataInputStream dis = null;
     private FileInputStream fis = null;
     private DataOutputStream dos = null;
+    private final Logger logger = LoggerFactory.getLogger("storage");
 
     public DownloadTask(Socket connection) {
         this.connection = connection;
@@ -29,7 +31,7 @@ public class DownloadTask implements Runnable {
             dos = new DataOutputStream(connection.getOutputStream());
             String filePath = dis.readUTF();
             if (filePath.equals("")) {
-                Logger.warning("File Path Is Null");
+                logger.warn("File Path Is Null");
                 dos.writeUTF("Error: File Path Is Null");
                 return;
             }
@@ -37,11 +39,11 @@ public class DownloadTask implements Runnable {
             String realPath = new StringBuilder(filePath).replace(0, 11, Initializer.STORE_PATH).toString();
             File file = new File(realPath);
             if (!file.exists() || !file.isFile()) {
-                Logger.warning("File Not Found: " + filePath);
+                logger.warn("File Not Found: " + filePath);
                 dos.writeUTF("File Not Found: " + filePath);
                 return;
             }
-            Logger.info("Download Start");
+            logger.info("Download Start");
             dos.writeUTF("Download Start");
             fis = new FileInputStream(file);
             byte[] fileBytes = new byte[1024];
@@ -49,7 +51,7 @@ public class DownloadTask implements Runnable {
                 dos.write(fileBytes);
             }
             connection.shutdownOutput();
-            Logger.info("Download File Success: " + filePath);
+            logger.info("Download File Success: " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

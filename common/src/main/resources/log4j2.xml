@@ -54,6 +54,7 @@
         <root level="all">
             <appender-ref ref="Console"/>
             <appender-ref ref="TRACKER"/>
+            <appender-ref ref="STORAGE"/>
         </root>
     </loggers>
 </configuration>

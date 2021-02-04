@@ -2,10 +2,10 @@ package net.industryhive.common.logger;
 
 /**
  * @Author 未央
- * @Create 2020-10-23 09:27
+ * @Create 2021-02-04 17:40
  */
-public class LogInfo {
-    public static final String INVALID_PROTOCOL = "Invalid Protocol";
+public class TrackerMsg {
+    public static final String INVALID_PROTOCOL = "Invalid Tracker Protocol";
     public static final String STORAGE_NOT_FOUNT = "Storage Not Found";
 
     public static String TRACKER_INITIALIZE_FAILURE(String trackerId) {
@@ -22,13 +22,5 @@ public class LogInfo {
 
     public static String TRACKER_START_SUCCESS(String trackerId) {
         return "Tracker[" + trackerId + "] Start Success";
-    }
-
-    public static String STORAGE_START_FAILURE(String storageId) {
-        return "Storage[" + storageId + "] Start Failure";
-    }
-
-    public static String STORAGE_START_SUCCESS(String storageId) {
-        return "Storage[" + storageId + "] Start Success";
     }
 }

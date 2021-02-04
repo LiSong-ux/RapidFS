@@ -1,9 +1,10 @@
 package net.industryhive.storage.task;
 
 import net.industryhive.common.connect.Sweeper;
-import net.industryhive.common.logger.Logger;
 import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -24,6 +25,7 @@ public class UploadTask implements Runnable {
     private final Socket connection;
     private DataInputStream dis = null;
     private FileOutputStream fos = null;
+    private final Logger logger = LoggerFactory.getLogger("storage");
 
     public UploadTask(Socket connection) {
         this.connection = connection;
@@ -36,12 +38,12 @@ public class UploadTask implements Runnable {
             String stagePath = Initializer.STORE_PATH + "/" + Initializer.currentStage;
             File stageDir = new File(stagePath);
             if (!stageDir.exists()) {
-                Logger.error("Path Not Found: " + stagePath);
+                logger.error("Path Not Found: " + stagePath);
                 Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Path Not Found: " + stagePath);
                 return;
             }
             if (!stageDir.isDirectory()) {
-                Logger.error("Path Is Not A Directory: " + stagePath);
+                logger.error("Path Is Not A Directory: " + stagePath);
                 Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Path Is Not A Directory: " + stagePath);
                 return;
             }
@@ -66,7 +68,7 @@ public class UploadTask implements Runnable {
                 fos.write(bytes, 0, length);
             }
             String uploadPath = "group" + Initializer.GROUP_ID + "/M00/" + Initializer.currentStage + "/" + fileName;
-            Logger.info("Upload File Success: " + uploadPath);
+            logger.info("Upload File Success: " + uploadPath);
             Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, uploadPath);
             Initializer.reStorePointer(stagePath);
         } catch (IOException e) {

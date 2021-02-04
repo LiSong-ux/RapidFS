@@ -1,13 +1,14 @@
 package net.industryhive.storage.connect;
 
 import net.industryhive.common.connect.Sweeper;
-import net.industryhive.common.logger.LogInfo;
-import net.industryhive.common.logger.Logger;
+import net.industryhive.common.logger.StorageMsg;
 import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
 import net.industryhive.storage.service.FileDownload;
 import net.industryhive.storage.service.FileQuery;
 import net.industryhive.storage.service.FileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 public class Connector {
     private static ServerSocket SERVER_SOCKET = null;
     private static boolean flag = true;
+    private static final Logger logger = LoggerFactory.getLogger("storage");
 
     static {
         try {
@@ -39,32 +41,32 @@ public class Connector {
 
     public static void connect() {
         if (Initializer.initialize() != 0) {
-            Logger.error(LogInfo.STORAGE_START_FAILURE(Initializer.STORAGE_ID));
+            logger.error(StorageMsg.STORAGE_START_FAILURE(Initializer.STORAGE_ID));
             return;
         }
-        Logger.info(LogInfo.STORAGE_START_SUCCESS(Initializer.STORAGE_ID));
+        logger.info(StorageMsg.STORAGE_START_SUCCESS(Initializer.STORAGE_ID));
 
         while (flag) {
             try {
                 Socket connection = SERVER_SOCKET.accept();
                 InputStream reqStream = connection.getInputStream();
-                byte[] header = new byte[8];
+                byte[] header = new byte[9];
                 int length = reqStream.read(header);
                 byte[] recognize = Arrays.copyOf(header, 7);
-                if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE)) {
-                    Logger.warning(LogInfo.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, LogInfo.INVALID_PROTOCOL);
+                if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE_STORAGE)) {
+                    logger.warn(StorageMsg.INVALID_PROTOCOL);
+                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
                     continue;
                 }
-                if (header[7] == BaseProtocol.UPLOAD_COMMAND) {
+                if (header[8] == BaseProtocol.UPLOAD_COMMAND) {
                     FileUpload.upload(connection);
-                } else if (header[7] == BaseProtocol.DOWNLOAD_COMMAND) {
+                } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND) {
                     FileDownload.download(connection);
-                } else if (header[7] == BaseProtocol.QUERY_COMMAND) {
+                } else if (header[8] == BaseProtocol.QUERY_COMMAND) {
                     FileQuery.query(connection);
                 } else {
-                    Logger.warning(LogInfo.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, LogInfo.INVALID_PROTOCOL);
+                    logger.warn(StorageMsg.INVALID_PROTOCOL);
+                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

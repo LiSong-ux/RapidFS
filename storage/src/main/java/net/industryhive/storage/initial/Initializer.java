@@ -1,8 +1,9 @@
 package net.industryhive.storage.initial;
 
 import net.industryhive.common.config.PropertiesLoader;
-import net.industryhive.common.logger.Logger;
 import net.industryhive.common.system.Constant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,31 +29,32 @@ public class Initializer {
             PropertiesLoader.getValue("storage.port");
     public static final String STORE_PATH =
             PropertiesLoader.getValue("store.path");
+    private static final Logger logger = LoggerFactory.getLogger("storage");
 
     public static int initialize() {
         if (GROUP_ID == null) {
-            Logger.error("group.id Is Null");
+            logger.error("group.id Is Null");
             return 3;
         }
         if (STORAGE_ID == null) {
-            Logger.error("storage.id Is Null");
+            logger.error("storage.id Is Null");
             return 1;
         }
         if (STORE_PATH == null) {
-            Logger.error("store.path Is Null");
+            logger.error("store.path Is Null");
             return 2;
         }
         File storePath = new File(STORE_PATH);
         if (!storePath.exists()) {
-            Logger.info("Storage[" + STORAGE_ID + "] Initialize Start");
+            logger.info("Storage[" + STORAGE_ID + "] Initialize Start");
             boolean mdSP = storePath.mkdirs();
             if (!mdSP) {
-                Logger.error("Make store_path Error: " + STORE_PATH);
+                logger.error("Make store_path Error: " + STORE_PATH);
                 return 3;
             }
         } else {
             if (!storePath.isDirectory()) {
-                Logger.error("store_path Is Not A Directory: " + STORE_PATH);
+                logger.error("store_path Is Not A Directory: " + STORE_PATH);
                 return 4;
             }
         }
@@ -64,15 +66,15 @@ public class Initializer {
                 if (stageDir.exists()) continue;
                 boolean mdSD = stageDir.mkdirs();
                 if (!mdSD) {
-                    Logger.error("Storage[" + STORAGE_ID + "] Initialize Error");
+                    logger.error("Storage[" + STORAGE_ID + "] Initialize Error");
                     return 5;
                 }
             }
-            Logger.info("Storage[" + STORAGE_ID + "] Initialize Success");
+            logger.info("Storage[" + STORAGE_ID + "] Initialize Success");
         }
         int reStoreResult = storePointer(STORE_PATH);
         if (reStoreResult == 0) {
-            Logger.info("Number Of Files Stored Normal");
+            logger.info("Number Of Files Stored Normal");
         }
         return 0;
     }
@@ -83,11 +85,11 @@ public class Initializer {
         for (String stageName : STAGE_NAMES) {
             File stage = new File(store_path + "/" + stageName);
             if (!stage.exists()) {
-                Logger.error("Directory Not Found: /" + stageName);
+                logger.error("Directory Not Found: /" + stageName);
                 return 2;
             }
             if (!stage.isDirectory()) {
-                Logger.error("Path Is Not A Directory: /" + stageName);
+                logger.error("Path Is Not A Directory: /" + stageName);
                 return 3;
             }
             String[] files = stage.list();
@@ -99,7 +101,7 @@ public class Initializer {
             }
             index++;
         }
-        Logger.warning("Files Stored Number Reached Maximum");
+        logger.warn("Files Stored Number Reached Maximum");
         return 1;
     }
 

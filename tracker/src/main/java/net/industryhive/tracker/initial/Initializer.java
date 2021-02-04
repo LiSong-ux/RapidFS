@@ -1,9 +1,10 @@
 package net.industryhive.tracker.initial;
 
 import net.industryhive.common.config.PropertiesLoader;
-import net.industryhive.common.logger.LogInfo;
-import net.industryhive.common.logger.Logger;
+import net.industryhive.common.logger.TrackerMsg;
 import net.industryhive.common.system.Constant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
@@ -12,6 +13,8 @@ import java.util.HashMap;
  * @Create 2020-10-18 11:50
  */
 public class Initializer {
+    private static final Logger logger = LoggerFactory.getLogger("tracker");
+
     static {
         Constant.setCurrentSys("TRACKER");
     }
@@ -34,11 +37,11 @@ public class Initializer {
             STORAGE_MAP.put(groupName, storages);
         }
         if (STORAGE_MAP.size() < 1) {
-            Logger.error(LogInfo.STORAGE_NOT_FOUNT);
-            Logger.error(LogInfo.TRACKER_INITIALIZE_FAILURE(TRACKER_ID));
+            logger.error(TrackerMsg.STORAGE_NOT_FOUNT);
+            logger.error(TrackerMsg.TRACKER_INITIALIZE_FAILURE(TRACKER_ID));
             return 1;
         }
-        Logger.info(LogInfo.TRACKER_INITIALIZE_SUCCESS(TRACKER_ID));
+        logger.info(TrackerMsg.TRACKER_INITIALIZE_SUCCESS(TRACKER_ID));
         return 0;
     }
 }
