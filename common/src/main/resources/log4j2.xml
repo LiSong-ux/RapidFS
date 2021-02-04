@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<configuration status="WARN" monitorInterval="30">
+    <properties>
+        <property name="LOG_HOME">D:/logs</property>
+        <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <RollingFile name="TRACKER" fileName="${LOG_HOME}/tracker/tracker.log"
+                     filePattern="${LOG_HOME}/tracker/$${date:yyyy-MM}/tracker.%d{yyyy-MM-dd}.%i.log.gz">
+            <!--过滤器 只统计info级别-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!--按照时间拆分 规则如上filePattern-->
+                <TimeBasedTriggeringPolicy/>
+                <!--指定日志文件尺寸-->
+                <SizeBasedTriggeringPolicy size="8MB"/>
+            </Policies>
+            <!--指定保留文件的个数 默认同一目录下7个-->
+            <DefaultRolloverStrategy max="35"/>
+        </RollingFile>
+        <RollingFile name="STORAGE" fileName="${LOG_HOME}/storage/storage.log"
+                     filePattern="${LOG_HOME}/storage/$${date:yyyy-MM}/storage.%d{yyyy-MM-dd}.%i.log.gz">
+            <!--过滤器 只统计info级别-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!--按照时间拆分 规则如上filePattern-->
+                <TimeBasedTriggeringPolicy/>
+                <!--指定日志文件尺寸-->
+                <SizeBasedTriggeringPolicy size="8MB"/>
+            </Policies>
+            <!--指定保留文件的个数 默认同一目录下7个-->
+            <DefaultRolloverStrategy max="35"/>
+        </RollingFile>
+    </Appenders>
+
+    <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
+    <loggers>
+        <logger name="tracker" level="INFO" additivity="false">
+            <appender-ref ref="TRACKER"/>
+        </logger>
+        <logger name="storage" level="INFO" additivity="false">
+            <appender-ref ref="STORAGE"/>
+        </logger>
+        <root level="all">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="TRACKER"/>
+        </root>
+    </loggers>
+</configuration>
