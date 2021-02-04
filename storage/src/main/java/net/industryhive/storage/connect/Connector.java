@@ -52,7 +52,7 @@ public class Connector {
                 InputStream reqStream = connection.getInputStream();
                 byte[] header = new byte[9];
                 int length = reqStream.read(header);
-                byte[] recognize = Arrays.copyOf(header, 7);
+                byte[] recognize = Arrays.copyOf(header, 8);
                 if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE_STORAGE)) {
                     logger.warn(StorageMsg.INVALID_PROTOCOL);
                     Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);

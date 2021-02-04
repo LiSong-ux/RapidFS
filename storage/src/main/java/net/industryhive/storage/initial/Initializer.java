@@ -106,7 +106,8 @@ public class Initializer {
     }
 
     public static synchronized void reStorePointer(String stagePath) {
-        if (!currentStage.equals(stagePath)) {
+        String currentPath = Initializer.STORE_PATH + "/" + currentStage;
+        if (!currentPath.equals(stagePath)) {
             return;
         }
         File stageDir = new File(stagePath);

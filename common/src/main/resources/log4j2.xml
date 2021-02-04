@@ -5,7 +5,7 @@
 <configuration status="WARN" monitorInterval="30">
     <properties>
         <property name="LOG_HOME">D:/logs</property>
-        <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>
+        <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level - %msg%n</property>
     </properties>
 
     <Appenders>
@@ -46,9 +46,11 @@
     <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
     <loggers>
         <logger name="tracker" level="INFO" additivity="false">
+            <appender-ref ref="Console"/>
             <appender-ref ref="TRACKER"/>
         </logger>
         <logger name="storage" level="INFO" additivity="false">
+            <appender-ref ref="Console"/>
             <appender-ref ref="STORAGE"/>
         </logger>
         <root level="all">
