@@ -1,6 +1,7 @@
 package net.industryhive.storage.initial;
 
 import net.industryhive.common.config.PropertiesLoader;
+import net.industryhive.common.logger.StorageMsg;
 import net.industryhive.common.system.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class Initializer {
         }
         int reStoreResult = storePointer(STORE_PATH);
         if (reStoreResult == 0) {
-            logger.info("Number Of Files Stored Normal");
+            logger.info(StorageMsg.STORED_NUMBER_NORMAL);
         }
         return 0;
     }
@@ -85,11 +86,11 @@ public class Initializer {
         for (String stageName : STAGE_NAMES) {
             File stage = new File(store_path + "/" + stageName);
             if (!stage.exists()) {
-                logger.error("Directory Not Found: /" + stageName);
+                logger.error(StorageMsg.DIRECTORY_NOT_FOUND(stageName));
                 return 2;
             }
             if (!stage.isDirectory()) {
-                logger.error("Path Is Not A Directory: /" + stageName);
+                logger.error(StorageMsg.PATH_IS_NOT_DIRECTORY(stageName));
                 return 3;
             }
             String[] files = stage.list();
@@ -101,7 +102,7 @@ public class Initializer {
             }
             index++;
         }
-        logger.warn("Files Stored Number Reached Maximum");
+        logger.warn(StorageMsg.STORED_NUMBER_MAX);
         return 1;
     }
 
