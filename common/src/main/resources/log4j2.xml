@@ -4,7 +4,7 @@
 <!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
 <configuration status="WARN" monitorInterval="30">
     <properties>
-        <property name="LOG_HOME">D:/logs</property>
+        <property name="LOG_HOME">../logs</property>
         <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level - %msg%n</property>
     </properties>
 
