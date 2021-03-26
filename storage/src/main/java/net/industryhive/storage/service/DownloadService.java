@@ -10,7 +10,7 @@ import java.net.Socket;
  * @Author 未央
  * @Create 2020-10-05 16:33
  */
-public class FileDownload {
+public class DownloadService {
     public static void download(Socket connection) {
         new Thread(new DownloadTask(connection)).start();
     }

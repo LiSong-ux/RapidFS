@@ -12,7 +12,7 @@ import java.net.Socket;
  * @Author 未央
  * @Create 2020-10-06 11:18
  */
-public class FileQuery {
+public class QueryService {
     public static void query(Socket connection) {
         DataInputStream dis = null;
         try {

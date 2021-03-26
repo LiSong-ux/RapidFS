@@ -4,9 +4,9 @@ import net.industryhive.common.connect.Sweeper;
 import net.industryhive.common.logger.StorageMsg;
 import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
-import net.industryhive.storage.service.FileDownload;
-import net.industryhive.storage.service.FileQuery;
-import net.industryhive.storage.service.FileUpload;
+import net.industryhive.storage.service.DownloadService;
+import net.industryhive.storage.service.QueryService;
+import net.industryhive.storage.service.UploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +59,11 @@ public class Connector {
                     continue;
                 }
                 if (header[8] == BaseProtocol.UPLOAD_COMMAND) {
-                    FileUpload.upload(connection);
+                    UploadService.upload(connection);
                 } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND) {
-                    FileDownload.download(connection);
+                    DownloadService.download(connection);
                 } else if (header[8] == BaseProtocol.QUERY_COMMAND) {
-                    FileQuery.query(connection);
+                    QueryService.query(connection);
                 } else {
                     logger.warn(StorageMsg.INVALID_PROTOCOL);
                     Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);

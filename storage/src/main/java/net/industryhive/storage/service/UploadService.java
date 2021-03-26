@@ -10,7 +10,7 @@ import java.net.Socket;
  * @Author 未央
  * @Create 2020-10-05 12:14
  */
-public class FileUpload {
+public class UploadService {
     public static void upload(Socket connection) {
         new Thread(new UploadTask(connection)).start();
     }
