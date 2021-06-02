@@ -61,11 +61,11 @@ public class Connector {
                     String[] storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
                     int storageIndex = random.nextInt(storages.length);
                     Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
-                } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND || header[7] == BaseProtocol.QUERY_COMMAND) {
+                } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND || header[8] == BaseProtocol.QUERY_COMMAND) {
                     DataInputStream dis = new DataInputStream(reqStream);
-                    String filePath = dis.readUTF();
-                    String groupName = filePath.substring(0, filePath.indexOf('/'));
-                    String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+                    String filepath = dis.readUTF();
+                    String groupName = filepath.substring(0, filepath.indexOf('/'));
+                    String fileName = filepath.substring(filepath.lastIndexOf('/') + 1);
                     String deSrc = fileName.substring(0, fileName.lastIndexOf('.'));
                     byte[] decode = Base64.getDecoder().decode(deSrc);
                     String realName = new String(decode, StandardCharsets.UTF_8);
