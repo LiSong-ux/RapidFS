@@ -2,7 +2,6 @@ package net.industryhive.storage.connect;
 
 import net.industryhive.common.connect.Sweeper;
 import net.industryhive.common.logger.StorageMsg;
-import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
 import net.industryhive.storage.service.DownloadService;
 import net.industryhive.storage.service.QueryService;
@@ -15,6 +14,8 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+
+import static net.industryhive.common.protocol.BaseProtocol.*;
 
 /**
  * 全局监听组件
@@ -53,20 +54,24 @@ public class Connector {
                 byte[] header = new byte[9];
                 int length = reqStream.read(header);
                 byte[] recognize = Arrays.copyOf(header, 8);
-                if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE_STORAGE)) {
+                if (length == -1 || !Arrays.equals(recognize, RECOGNIZE_STORAGE)) {
                     logger.warn(StorageMsg.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
+                    Sweeper.close(connection, RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
                     continue;
                 }
-                if (header[8] == BaseProtocol.UPLOAD_COMMAND) {
-                    UploadService.upload(connection);
-                } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND) {
-                    DownloadService.download(connection);
-                } else if (header[8] == BaseProtocol.QUERY_COMMAND) {
-                    QueryService.query(connection);
-                } else {
-                    logger.warn(StorageMsg.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
+                switch (header[8]) {
+                    case UPLOAD_COMMAND:
+                        UploadService.upload(connection);
+                        break;
+                    case DOWNLOAD_COMMAND:
+                        DownloadService.download(connection);
+                        break;
+                    case QUERY_COMMAND:
+                        QueryService.query(connection);
+                        break;
+                    default:
+                        logger.warn(StorageMsg.INVALID_PROTOCOL);
+                        Sweeper.close(connection, RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
