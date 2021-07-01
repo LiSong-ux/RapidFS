@@ -124,10 +124,14 @@ public class Initializer {
         ArrayList<String> stageNameList = new ArrayList<>();
         for (int i = 0; i < 256; i++) {
             String first = Integer.toHexString(i).toUpperCase();
-            if (first.length() == 1) first = "0" + first;
+            if (first.length() == 1) {
+                first = "0" + first;
+            }
             for (int j = 0; j < 256; j++) {
                 String second = Integer.toHexString(j).toUpperCase();
-                if (second.length() == 1) second = "0" + second;
+                if (second.length() == 1) {
+                    second = "0" + second;
+                }
                 String stageName = first + "/" + second;
                 stageNameList.add(stageName);
             }
