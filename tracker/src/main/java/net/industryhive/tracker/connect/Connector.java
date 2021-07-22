@@ -55,27 +55,34 @@ public class Connector {
                     Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
                     continue;
                 }
-                if (header[8] == BaseProtocol.UPLOAD_COMMAND) {
-                    Random random = new Random();
-                    int groupIndex = random.nextInt(Initializer.STORAGE_MAP.size());
-                    String[] storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
-                    int storageIndex = random.nextInt(storages.length);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
-                } else if (header[8] == BaseProtocol.DOWNLOAD_COMMAND || header[8] == BaseProtocol.QUERY_COMMAND) {
-                    DataInputStream dis = new DataInputStream(reqStream);
-                    String filepath = dis.readUTF();
-                    String groupName = filepath.substring(0, filepath.indexOf('/'));
-                    String fileName = filepath.substring(filepath.lastIndexOf('/') + 1);
-                    String deSrc = fileName.substring(0, fileName.lastIndexOf('.'));
-                    byte[] decode = Base64.getDecoder().decode(deSrc);
-                    String realName = new String(decode, StandardCharsets.UTF_8);
-                    String storageId = realName.substring(1, 3);
-                    int storageIndex = Integer.parseInt(storageId, 16);
-                    String[] storages = Initializer.STORAGE_MAP.get(groupName);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
-                } else {
-                    logger.warn(TrackerMsg.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
+                switch (header[8]) {
+                    case BaseProtocol.UPLOAD_COMMAND: {
+                        Random random = new Random();
+                        int groupIndex = random.nextInt(Initializer.STORAGE_MAP.size());
+                        String[] storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
+                        int storageIndex = random.nextInt(storages.length);
+                        Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
+                        break;
+                    }
+                    case BaseProtocol.DOWNLOAD_COMMAND:
+                    case BaseProtocol.QUERY_COMMAND: {
+                        DataInputStream dis = new DataInputStream(reqStream);
+                        String filepath = dis.readUTF();
+                        String groupName = filepath.substring(0, filepath.indexOf('/'));
+                        String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
+                        String deSrc = filename.substring(0, filename.lastIndexOf('.'));
+                        byte[] decode = Base64.getDecoder().decode(deSrc);
+                        String realName = new String(decode, StandardCharsets.UTF_8);
+                        String storageId = realName.substring(1, 3);
+                        int storageIndex = Integer.parseInt(storageId, 16);
+                        String[] storages = Initializer.STORAGE_MAP.get(groupName);
+                        Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
+                        break;
+                    }
+                    default: {
+                        logger.warn(TrackerMsg.INVALID_PROTOCOL);
+                        Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
