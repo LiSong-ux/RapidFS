@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
 
+import static net.industryhive.common.protocol.BaseProtocol.*;
+
 /**
  * @Author 未央
  * @Create 2020-10-16 14:15
@@ -55,17 +57,19 @@ public class Connector {
                     Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
                     continue;
                 }
+                int storageIndex;
+                String[] storages;
                 switch (header[8]) {
-                    case BaseProtocol.UPLOAD_COMMAND: {
+                    case UPLOAD_COMMAND:
                         Random random = new Random();
                         int groupIndex = random.nextInt(Initializer.STORAGE_MAP.size());
-                        String[] storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
-                        int storageIndex = random.nextInt(storages.length);
+                        storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
+                        storageIndex = random.nextInt(storages.length);
                         Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
                         break;
-                    }
-                    case BaseProtocol.DOWNLOAD_COMMAND:
-                    case BaseProtocol.QUERY_COMMAND: {
+                    case QUERY_COMMAND:
+                    case DELETE_COMMAND:
+                    case DOWNLOAD_COMMAND:
                         DataInputStream dis = new DataInputStream(reqStream);
                         String filepath = dis.readUTF();
                         String groupName = filepath.substring(0, filepath.indexOf('/'));
@@ -74,15 +78,13 @@ public class Connector {
                         byte[] decode = Base64.getDecoder().decode(deSrc);
                         String realName = new String(decode, StandardCharsets.UTF_8);
                         String storageId = realName.substring(1, 3);
-                        int storageIndex = Integer.parseInt(storageId, 16);
-                        String[] storages = Initializer.STORAGE_MAP.get(groupName);
+                        storageIndex = Integer.parseInt(storageId, 16);
+                        storages = Initializer.STORAGE_MAP.get(groupName);
                         Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
                         break;
-                    }
-                    default: {
+                    default:
                         logger.warn(TrackerMsg.INVALID_PROTOCOL);
                         Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
-                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -3,6 +3,7 @@ package net.industryhive.storage.connect;
 import net.industryhive.common.connect.Sweeper;
 import net.industryhive.common.logger.StorageMsg;
 import net.industryhive.storage.initial.Initializer;
+import net.industryhive.storage.service.DeleteService;
 import net.industryhive.storage.service.DownloadService;
 import net.industryhive.storage.service.QueryService;
 import net.industryhive.storage.service.UploadService;
@@ -68,6 +69,9 @@ public class Connector {
                         break;
                     case QUERY_COMMAND:
                         QueryService.query(connection);
+                        break;
+                    case DELETE_COMMAND:
+                        DeleteService.delete(connection);
                         break;
                     default:
                         logger.warn(StorageMsg.INVALID_PROTOCOL);
