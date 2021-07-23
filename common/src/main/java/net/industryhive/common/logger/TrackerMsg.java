@@ -6,6 +6,7 @@ package net.industryhive.common.logger;
  */
 public class TrackerMsg {
     public static final String INVALID_PROTOCOL = "Invalid Tracker Protocol";
+    public static final String INVALID_FILEPATH = "Invalid File Path";
     public static final String STORAGE_NOT_FOUNT = "Storage Not Found";
 
     public static String TRACKER_INITIALIZE_FAILURE(String trackerId) {

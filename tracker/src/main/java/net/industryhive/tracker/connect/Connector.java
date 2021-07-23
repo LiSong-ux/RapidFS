@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import static net.industryhive.common.protocol.BaseProtocol.*;
 
@@ -45,6 +46,10 @@ public class Connector {
             return;
         }
         logger.info(TrackerMsg.TRACKER_START_SUCCESS(Initializer.TRACKER_ID));
+
+        // group0/M00/00/00/TjAwMTYyNzAwNjA1MDMzNDEz.jpg
+        Pattern regCompile = Pattern.compile("^group\\d/M\\d{2}/\\d{2}/\\d{2}/\\w{24}\\.\\w+$");
+
         while (flag) {
             try {
                 Socket connection = SERVER_SOCKET.accept();
@@ -72,6 +77,10 @@ public class Connector {
                     case DOWNLOAD_COMMAND:
                         DataInputStream dis = new DataInputStream(reqStream);
                         String filepath = dis.readUTF();
+                        if (!regCompile.matcher(filepath).matches()) {
+                            Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_FILEPATH);
+                            break;
+                        }
                         String groupName = filepath.substring(0, filepath.indexOf('/'));
                         String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
                         String deSrc = filename.substring(0, filename.lastIndexOf('.'));

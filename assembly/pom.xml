@@ -43,7 +43,7 @@
                     <descriptors>
                         <descriptor>distribution.xml</descriptor>
                     </descriptors>
-                    <outputDirectory>C:\Users\LiSong-ux\Desktop\RapidFS</outputDirectory>
+                    <outputDirectory>C:\Users\ADMIN\Desktop\RapidFS</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
