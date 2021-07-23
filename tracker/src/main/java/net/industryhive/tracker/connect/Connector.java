@@ -48,7 +48,7 @@ public class Connector {
         logger.info(TrackerMsg.TRACKER_START_SUCCESS(Initializer.TRACKER_ID));
 
         // group0/M00/00/00/TjAwMTYyNzAwNjA1MDMzNDEz.jpg
-        Pattern regCompile = Pattern.compile("^group\\d/M\\d{2}/\\d{2}/\\d{2}/\\w{24}\\.\\w+$");
+        Pattern regCompile = Pattern.compile("^group\\d+/M\\d{2}/[0-9A-F]{2}/[0-9A-F]{2}/\\w+(\\.\\w+)?$");
 
         while (flag) {
             try {
