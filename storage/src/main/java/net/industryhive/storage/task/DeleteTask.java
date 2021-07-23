@@ -1,10 +1,14 @@
 package net.industryhive.storage.task;
 
+import net.industryhive.common.connect.Sweeper;
+import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.Socket;
 
 /**
@@ -14,7 +18,6 @@ import java.net.Socket;
 public class DeleteTask implements Runnable {
     private final Socket connection;
     private DataInputStream dis = null;
-    private DataOutputStream dos = null;
     private final Logger logger = LoggerFactory.getLogger("storage");
 
     public DeleteTask(Socket connection) {
@@ -24,39 +27,37 @@ public class DeleteTask implements Runnable {
     @Override
     public void run() {
         try {
+            String message;
             dis = new DataInputStream(connection.getInputStream());
-            dos = new DataOutputStream(connection.getOutputStream());
+            String stagePath = Initializer.STORE_PATH + "/" + Initializer.currentStage;
             String filepath = dis.readUTF();
             if (filepath.equals("")) {
-                logger.warn("File Path Is Null");
-                dos.writeUTF("Error: File Path Is Null");
+                message = "Error: File Path Is Null";
+                logger.warn(message);
+                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, message);
                 return;
             }
 
             String realpath = new StringBuilder(filepath).replace(0, 11, Initializer.STORE_PATH).toString();
             File file = new File(realpath);
             if (!file.exists() || !file.isFile()) {
-                String message = "File Not Found: " + filepath;
+                message = "File Not Found: " + filepath;
                 logger.warn(message);
-                dos.writeUTF(message);
+                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, message);
                 return;
             }
-            String message;
             if (!file.delete()) {
                 message = "Delete File Failed: " + filepath;
             } else {
                 message = "Delete File Success: " + filepath;
             }
+            Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, filepath);
+            Initializer.reStorePointer(stagePath);
             logger.info(message);
-            dos.writeUTF(message);
-            connection.shutdownOutput();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (dos != null) {
-                    dos.close();
-                }
                 if (dis != null) {
                     dis.close();
                 }
