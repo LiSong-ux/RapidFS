@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Date;
 
 /**
  * 文件上传任务执行类
@@ -47,11 +46,29 @@ public class UploadTask implements Runnable {
                 Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Path Is Not A Directory: " + stagePath);
                 return;
             }
+
+            // 拼接临时文件名并向磁盘写入文件
+            String tempFilename = System.currentTimeMillis() + Math.random() + "";
+            String tempRealPath = stagePath + "/" + tempFilename;
+            File file = new File(tempRealPath);
+            fos = new FileOutputStream(file);
+            byte[] bytes = new byte[1024];
+            int length;
+            while ((length = dis.read(bytes)) != -1) {
+                fos.write(bytes, 0, length);
+            }
+
+            // 拼接最终文件名
             String storageId = Integer.toHexString(Integer.parseInt(Initializer.STORAGE_ID));
-            if (storageId.length() == 1) storageId = "0" + storageId;
-            String encoding = "N" + storageId + new Date().getTime() + (int) (Math.random() * 90 + 10);
+            if (storageId.length() == 1) {
+                storageId = "0" + storageId;
+            }
+            String encoding = storageId + file.length() + System.currentTimeMillis() + (int) (Math.random() * 90 + 10);
             byte[] enSrc = encoding.getBytes(StandardCharsets.UTF_8);
             String encoded = Base64.getEncoder().encodeToString(enSrc);
+            if (encoded.endsWith("=")) {
+                encoded = encoded.substring(0, encoded.indexOf("="));
+            }
             String realName = dis.readUTF();
             String fileName;
             if (realName.contains(".")) {
@@ -60,13 +77,16 @@ public class UploadTask implements Runnable {
             } else {
                 fileName = encoded;
             }
-            File file = new File(stagePath + "/" + fileName);
-            fos = new FileOutputStream(file);
-            byte[] bytes = new byte[1024];
-            int length;
-            while ((length = dis.read(bytes)) != -1) {
-                fos.write(bytes, 0, length);
+
+            // 修改临时文件的文件名为最终文件名
+            if (!file.renameTo(new File(stagePath + "/" + fileName))) {
+                logger.error("Rename Temporary File Failed: " + tempRealPath);
+                if (!file.delete()) {
+                    logger.error("Delete Temporary File Failed: " + tempRealPath);
+                }
+                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Upload File Failed: 510");
             }
+
             String uploadPath = "group" + Initializer.GROUP_ID + "/M00/" + Initializer.currentStage + "/" + fileName;
             logger.info("Upload File Success: " + uploadPath);
             Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, uploadPath);
