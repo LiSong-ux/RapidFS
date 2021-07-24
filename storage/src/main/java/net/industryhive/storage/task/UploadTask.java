@@ -47,6 +47,13 @@ public class UploadTask implements Runnable {
                 return;
             }
 
+            //获取客户端上传的原始文件名，截取文件扩展名
+            String realName = dis.readUTF();
+            String extension = "";
+            if (realName.contains(".")) {
+                extension = realName.substring(realName.lastIndexOf("."));
+            }
+
             // 拼接临时文件名并向磁盘写入文件
             String tempFilename = System.currentTimeMillis() + Math.random() + "";
             String tempRealPath = stagePath + "/" + tempFilename;
@@ -69,14 +76,7 @@ public class UploadTask implements Runnable {
             if (encoded.endsWith("=")) {
                 encoded = encoded.substring(0, encoded.indexOf("="));
             }
-            String realName = dis.readUTF();
-            String fileName;
-            if (realName.contains(".")) {
-                String extension = realName.substring(realName.lastIndexOf("."));
-                fileName = encoded + extension;
-            } else {
-                fileName = encoded;
-            }
+            String fileName = encoded + extension;
 
             // 修改临时文件的文件名为最终文件名
             if (!file.renameTo(new File(stagePath + "/" + fileName))) {
