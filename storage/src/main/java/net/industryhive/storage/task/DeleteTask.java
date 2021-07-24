@@ -3,6 +3,7 @@ package net.industryhive.storage.task;
 import net.industryhive.common.connect.Sweeper;
 import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
+import net.industryhive.storage.util.StorageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,15 +35,9 @@ public class DeleteTask implements Runnable {
             dis = new DataInputStream(connection.getInputStream());
             String stagePath = Initializer.STORE_PATH + "/" + Initializer.currentStage;
             String filepath = dis.readUTF();
-            if (filepath.equals("")) {
-                message = "Error: File Path Is Null";
-                logger.warn(message);
-                Sweeper.sweep(connection, RESPONSE_FAILURE, message);
-                return;
-            }
 
-            String realpath = new StringBuilder(filepath).replace(0, 11, Initializer.STORE_PATH).toString();
-            File file = new File(realpath);
+            File file = new File(StorageUtil.getRealpath(filepath));
+
             if (!file.exists() || !file.isFile()) {
                 message = "File Not Found: " + filepath;
                 logger.warn(message);

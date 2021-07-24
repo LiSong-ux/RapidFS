@@ -29,6 +29,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -43,7 +44,7 @@
                     <descriptors>
                         <descriptor>distribution.xml</descriptor>
                     </descriptors>
-                    <outputDirectory>C:\Users\ADMIN\Desktop\RapidFS</outputDirectory>
+                    <outputDirectory>C:\Users\LiSong-ux\Desktop\RapidFS</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

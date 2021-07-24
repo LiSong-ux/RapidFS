@@ -19,10 +19,10 @@ public class IOUtil {
 
     public static boolean writeIn(InputStream source, File target) {
         try (FileOutputStream fos = new FileOutputStream(target)) {
-            byte[] bytes = new byte[1024];
             int length;
-            while ((length = source.read(bytes)) != -1) {
-                fos.write(bytes, 0, length);
+            byte[] buffer = new byte[1024];
+            while ((length = source.read(buffer)) != -1) {
+                fos.write(buffer, 0, length);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,9 +33,10 @@ public class IOUtil {
 
     public static boolean writeOut(File source, OutputStream target) {
         try (FileInputStream fis = new FileInputStream(source)) {
-            byte[] fileBytes = new byte[1024];
-            while (fis.read(fileBytes) != -1) {
-                target.write(fileBytes);
+            int length;
+            byte[] buffer = new byte[1024];
+            while ((length = fis.read(buffer)) != -1) {
+                target.write(buffer, 0, length);
             }
         } catch (Exception e) {
             e.printStackTrace();
