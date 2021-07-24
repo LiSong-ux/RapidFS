@@ -59,7 +59,7 @@ public class Connector {
                 byte[] recognize = Arrays.copyOf(header, 8);
                 if (length == -1 || !Arrays.equals(recognize, BaseProtocol.RECOGNIZE_TRACKER)) {
                     logger.warn(TrackerMsg.INVALID_PROTOCOL);
-                    Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
+                    Sweeper.sweep(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
                     continue;
                 }
                 int storageIndex;
@@ -70,7 +70,7 @@ public class Connector {
                         int groupIndex = random.nextInt(Initializer.STORAGE_MAP.size());
                         storages = Initializer.STORAGE_MAP.get("group" + groupIndex);
                         storageIndex = random.nextInt(storages.length);
-                        Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
+                        Sweeper.sweep(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
                         break;
                     case QUERY_COMMAND:
                     case DELETE_COMMAND:
@@ -78,7 +78,7 @@ public class Connector {
                         DataInputStream dis = new DataInputStream(reqStream);
                         String filepath = dis.readUTF();
                         if (!regCompile.matcher(filepath).matches()) {
-                            Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_FILEPATH);
+                            Sweeper.sweep(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_FILEPATH);
                             break;
                         }
                         String groupName = filepath.substring(0, filepath.indexOf('/'));
@@ -86,14 +86,14 @@ public class Connector {
                         String deSrc = filename.substring(0, filename.lastIndexOf('.'));
                         byte[] decode = Base64.getDecoder().decode(deSrc);
                         String realName = new String(decode, StandardCharsets.UTF_8);
-                        String storageId = realName.substring(1, 3);
+                        String storageId = realName.substring(0, 2);
                         storageIndex = Integer.parseInt(storageId, 16);
                         storages = Initializer.STORAGE_MAP.get(groupName);
-                        Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
+                        Sweeper.sweep(connection, BaseProtocol.RESPONSE_SUCCESS, storages[storageIndex]);
                         break;
                     default:
                         logger.warn(TrackerMsg.INVALID_PROTOCOL);
-                        Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
+                        Sweeper.sweep(connection, BaseProtocol.RESPONSE_FAILURE, TrackerMsg.INVALID_PROTOCOL);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

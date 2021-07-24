@@ -1,18 +1,21 @@
 package net.industryhive.storage.task;
 
 import net.industryhive.common.connect.Sweeper;
-import net.industryhive.common.protocol.BaseProtocol;
 import net.industryhive.storage.initial.Initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import static net.industryhive.common.protocol.BaseProtocol.RESPONSE_FAILURE;
+import static net.industryhive.common.protocol.BaseProtocol.RESPONSE_SUCCESS;
+import static net.industryhive.common.util.IOUtil.*;
+import static net.industryhive.storage.initial.Initializer.STORAGE_ID;
 
 /**
  * 文件上传任务执行类
@@ -23,7 +26,6 @@ import java.util.Base64;
 public class UploadTask implements Runnable {
     private final Socket connection;
     private DataInputStream dis = null;
-    private FileOutputStream fos = null;
     private final Logger logger = LoggerFactory.getLogger("storage");
 
     public UploadTask(Socket connection) {
@@ -38,12 +40,12 @@ public class UploadTask implements Runnable {
             File stageDir = new File(stagePath);
             if (!stageDir.exists()) {
                 logger.error("Path Not Found: " + stagePath);
-                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Path Not Found: " + stagePath);
+                Sweeper.sweep(connection, RESPONSE_FAILURE, "Path Not Found: " + stagePath);
                 return;
             }
             if (!stageDir.isDirectory()) {
                 logger.error("Path Is Not A Directory: " + stagePath);
-                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Path Is Not A Directory: " + stagePath);
+                Sweeper.sweep(connection, RESPONSE_FAILURE, "Path Is Not A Directory: " + stagePath);
                 return;
             }
 
@@ -55,18 +57,16 @@ public class UploadTask implements Runnable {
             }
 
             // 拼接临时文件名并向磁盘写入文件
-            String tempFilename = System.currentTimeMillis() + Math.random() + "";
-            String tempRealPath = stagePath + "/" + tempFilename;
-            File file = new File(tempRealPath);
-            fos = new FileOutputStream(file);
-            byte[] bytes = new byte[1024];
-            int length;
-            while ((length = dis.read(bytes)) != -1) {
-                fos.write(bytes, 0, length);
+            String tempFilepath = stagePath + "/" + Math.random();
+            File file = new File(tempFilepath);
+
+            // 文件写入操作
+            if (!writeIn(dis, file)) {
+                Sweeper.sweep(connection, RESPONSE_FAILURE, "Write File Failed: 520");
             }
 
             // 拼接最终文件名
-            String storageId = Integer.toHexString(Integer.parseInt(Initializer.STORAGE_ID));
+            String storageId = Integer.toHexString(Integer.parseInt(STORAGE_ID));
             if (storageId.length() == 1) {
                 storageId = "0" + storageId;
             }
@@ -80,33 +80,23 @@ public class UploadTask implements Runnable {
 
             // 修改临时文件的文件名为最终文件名
             if (!file.renameTo(new File(stagePath + "/" + fileName))) {
-                logger.error("Rename Temporary File Failed: " + tempRealPath);
+                logger.error("Rename Temporary File Failed: " + tempFilepath);
                 if (!file.delete()) {
-                    logger.error("Delete Temporary File Failed: " + tempRealPath);
+                    logger.error("Delete Temporary File Failed: " + tempFilepath);
                 }
-                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "Upload File Failed: 510");
+                Sweeper.sweep(connection, RESPONSE_FAILURE, "Upload File Failed: 510");
+                return;
             }
 
             String uploadPath = "group" + Initializer.GROUP_ID + "/M00/" + Initializer.currentStage + "/" + fileName;
             logger.info("Upload File Success: " + uploadPath);
-            Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, uploadPath);
+            Sweeper.sweep(connection, RESPONSE_SUCCESS, uploadPath);
             Initializer.reStorePointer(stagePath);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-                if (dis != null) {
-                    dis.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            close(dis);
+            close(connection);
         }
     }
 }

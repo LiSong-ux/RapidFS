@@ -13,4 +13,5 @@ public class BaseProtocol {
     public static final byte DELETE_COMMAND = 3;
     public static final short RESPONSE_SUCCESS = 200;
     public static final short RESPONSE_FAILURE = 400;
+    public static final short DOWNLOAD_START = 210;
 }

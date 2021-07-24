@@ -1,11 +1,17 @@
 package net.industryhive.storage.task;
 
+import net.industryhive.common.connect.Sweeper;
+import net.industryhive.common.util.IOUtil;
 import net.industryhive.storage.initial.Initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+
+import static net.industryhive.common.protocol.BaseProtocol.DOWNLOAD_START;
+import static net.industryhive.common.protocol.BaseProtocol.RESPONSE_FAILURE;
+import static net.industryhive.common.util.IOUtil.close;
 
 /**
  * 文件下载任务执行类
@@ -39,35 +45,28 @@ public class DownloadTask implements Runnable {
             String realPath = new StringBuilder(filePath).replace(0, 11, Initializer.STORE_PATH).toString();
             File file = new File(realPath);
             if (!file.exists() || !file.isFile()) {
-                logger.warn("File Not Found: " + filePath);
-                dos.writeUTF("File Not Found: " + filePath);
+                String message = "File Not Found: " + filePath;
+                logger.warn(message);
+                Sweeper.sweep(connection, RESPONSE_FAILURE, message);
                 return;
             }
             logger.info("Download Start");
-            dos.writeUTF("Download Start");
-            fis = new FileInputStream(file);
-            byte[] fileBytes = new byte[1024];
-            while (fis.read(fileBytes) != -1) {
-                dos.write(fileBytes);
+
+            dos.write(DOWNLOAD_START);
+            if (!IOUtil.writeOut(file, dos)) {
+                Sweeper.sweep(connection, RESPONSE_FAILURE, "Read File Failed: 530");
             }
             connection.shutdownOutput();
+
+            logger.info("Download Over");
+
             logger.info("Download File Success: " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (dos != null) {
-                    dos.close();
-                }
-                if (fis != null) {
-                    fis.close();
-                }
-                if (dis != null) {
-                    dis.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            close(dos);
+            close(fis);
+            close(dis);
         }
     }
 }

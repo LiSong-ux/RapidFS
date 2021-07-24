@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
+import static net.industryhive.common.protocol.BaseProtocol.RESPONSE_FAILURE;
+import static net.industryhive.common.util.IOUtil.close;
+
 /**
  * @author LiSong-ux
  * @create 2021-07-22 19:54
@@ -34,7 +37,7 @@ public class DeleteTask implements Runnable {
             if (filepath.equals("")) {
                 message = "Error: File Path Is Null";
                 logger.warn(message);
-                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, message);
+                Sweeper.sweep(connection, RESPONSE_FAILURE, message);
                 return;
             }
 
@@ -43,7 +46,7 @@ public class DeleteTask implements Runnable {
             if (!file.exists() || !file.isFile()) {
                 message = "File Not Found: " + filepath;
                 logger.warn(message);
-                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, message);
+                Sweeper.sweep(connection, RESPONSE_FAILURE, message);
                 return;
             }
             if (!file.delete()) {
@@ -51,19 +54,13 @@ public class DeleteTask implements Runnable {
             } else {
                 message = "Delete File Success: " + filepath;
             }
-            Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, filepath);
+            Sweeper.sweep(connection, BaseProtocol.RESPONSE_SUCCESS, filepath);
             Initializer.reStorePointer(stagePath);
             logger.info(message);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (dis != null) {
-                    dis.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            close(dis);
         }
     }
 }

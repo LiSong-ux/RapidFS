@@ -20,9 +20,9 @@ public class QueryService {
             String fileName = dis.readUTF();
             File file = new File(fileName);
             if (file.exists()) {
-                Sweeper.close(connection, BaseProtocol.RESPONSE_SUCCESS, file.getName());
+                Sweeper.sweep(connection, BaseProtocol.RESPONSE_SUCCESS, file.getName());
             } else {
-                Sweeper.close(connection, BaseProtocol.RESPONSE_FAILURE, "File Not Exist: " + file.getName());
+                Sweeper.sweep(connection, BaseProtocol.RESPONSE_FAILURE, "File Not Exist: " + file.getName());
             }
         } catch (IOException e) {
             e.printStackTrace();

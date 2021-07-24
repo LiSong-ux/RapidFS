@@ -16,7 +16,7 @@ public class Sweeper {
      * @param status     执行状态
      * @param result     执行详细信息
      */
-    public static void close(Socket connection, short status, String result) {
+    public static void sweep(Socket connection, short status, String result) {
         DataOutputStream dos = null;
         try {
             dos = new DataOutputStream(connection.getOutputStream());

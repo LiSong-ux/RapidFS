@@ -57,7 +57,7 @@ public class Connector {
                 byte[] recognize = Arrays.copyOf(header, 8);
                 if (length == -1 || !Arrays.equals(recognize, RECOGNIZE_STORAGE)) {
                     logger.warn(StorageMsg.INVALID_PROTOCOL);
-                    Sweeper.close(connection, RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
+                    Sweeper.sweep(connection, RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
                     continue;
                 }
                 switch (header[8]) {
@@ -75,7 +75,7 @@ public class Connector {
                         break;
                     default:
                         logger.warn(StorageMsg.INVALID_PROTOCOL);
-                        Sweeper.close(connection, RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
+                        Sweeper.sweep(connection, RESPONSE_FAILURE, StorageMsg.INVALID_PROTOCOL);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
