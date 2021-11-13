@@ -66,6 +66,7 @@ public class UploadTask implements Runnable {
             }
 
             // 拼接最终文件名
+            // 将storageId转换为16进制
             String storageId = Integer.toHexString(Integer.parseInt(STORAGE_ID));
             if (storageId.length() == 1) {
                 storageId = "0" + storageId;
