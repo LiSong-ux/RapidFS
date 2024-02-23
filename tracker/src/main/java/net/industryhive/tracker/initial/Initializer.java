@@ -36,7 +36,7 @@ public class Initializer {
             }
             STORAGE_MAP.put(groupName, storages);
         }
-        if (STORAGE_MAP.size() < 1) {
+        if (STORAGE_MAP.isEmpty()) {
             logger.error(TrackerMsg.STORAGE_NOT_FOUNT);
             logger.error(TrackerMsg.TRACKER_INITIALIZE_FAILURE(TRACKER_ID));
             return 1;
